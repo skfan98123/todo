@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="date-container">
+            <span id="todays-date"></span>, <span id="day-of-week"></span>
+        </div>
+    </div>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <form class="task-form" action="/add" method="post">
+            <input class="task-input" type="text" name="task" placeholder="Add a task" required>
+            <button class="task-submit" type="submit">Add</button>
+        </form>
+        <div class="lists-container">
+            <div class="incomplete-tasks">
+                <h2>Incomplete Tasks</h2>
+                <ul class="sortable">
+            {% for task in tasks %}
+                {% if not task.completed %}
+                    <li id="{{ task._id }}">
+                        <div class="task-details">
+                            <span class="drag-handle">&#9776;</span>
+                            <form class="task-form" action="/complete/{{ task._id }}" method="post">
+                                <input class="task-checkbox" type="checkbox" onchange="this.form.submit()" {% if task.completed %} checked {% endif %}>
+                                <span class="task-name">{{ task.name }}</span>
+                            </form>
+                        </div>
+                        <form class="task-form" action="/complete/{{ task._id }}" method="post">
+                          <br>
+                          <input class="due-date-input" type="date" name="due_date" value="{{ task.due_date or '' }}" onchange="updateDueDate('{{ task._id }}', this.value)">
+                        </form>
+                        <div class="delete-container">
+                            <button class="edit-button" onclick="editTask('{{ task._id }}')">
+                                <i class="far fa-edit"></i>
+                            </button>
+                            <form class="task-form" action="/delete/{{ task._id|string }}" method="post">
+                                <button class="delete-button" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+    <h2>Completed Tasks</h2>
+    <ul>
+        {% for task in tasks %}
+            {% if task.completed %}
+                <li><s>{{ task.name }}</s></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <div class="clear-button">
+        <form action="/clear" method="post">
+            <input type="submit" value="Clear Completed">
+        </form>
+    </div>
+</div>
+</div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="../static/script.js"></script>
+</body>
+</html>
